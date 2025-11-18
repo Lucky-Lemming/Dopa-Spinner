@@ -137,7 +137,7 @@ function drawWheel() {
       inner = minInner;
     }
 
-    const maxWidth = outer - inner;
+    const maxWidth = outer - 3;
 
     let text = label;
     let truncated = false;

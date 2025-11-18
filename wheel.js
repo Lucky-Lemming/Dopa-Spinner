@@ -4,7 +4,7 @@
 const CONFIG = {
   apiEndpoint: "/api/items",
   spinDurationMs: 1800,
-  extraSpins: 5, // base number of extra full rotations
+  extraSpins: 3, // base number of extra full rotations
   defaultStatusText: "Ready",
   noItemsMessage: "No items found for this category.",
   fontFamily: "bold 10px system-ui",

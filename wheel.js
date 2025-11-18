@@ -73,6 +73,7 @@ async function fetchItems() {
     drawWheel();
   } finally {
     setButtonsDisabled(false);
+    resetSpinLabel();
   }
 }
 
@@ -143,7 +144,7 @@ function drawWheel() {
 
     // Fixed truncation rule:
     // text must stay at least 3px inside the outer edge at this radius
-    let maxWidth = radius - 5 - rText;
+    let maxWidth = radius - 3 - rText;
     maxWidth = Math.max(20, maxWidth); // minimum width so it is not absurdly tiny
 
     let text = label;
@@ -181,8 +182,6 @@ function drawWheel() {
   ctx.closePath();
   ctx.fill();
 }
-
-
 
 // Spin logic
 function spinWheel() {
@@ -224,6 +223,7 @@ function spinWheel() {
       const selected = items[targetIndex];
       selectedEl.textContent = selected.label || "";
       setStatus(CONFIG.defaultStatusText);
+      spinBtn.textContent = "🎲 Spin Again";
     }
   }
 
@@ -239,6 +239,10 @@ function setButtonsDisabled(disabled) {
   spinBtn.disabled = disabled || !items.length;
 }
 
+function resetSpinLabel() {
+  spinBtn.textContent = "🎲 Spin";
+}
+
 // Events
 refreshBtn.addEventListener("click", fetchItems);
 spinBtn.addEventListener("click", spinWheel);
@@ -251,4 +255,5 @@ window.addEventListener("resize", () => {
 // Initial load
 setStatus(CONFIG.defaultStatusText);
 resizeCanvas();
+resetSpinLabel();
 fetchItems();

@@ -7,7 +7,7 @@ const CONFIG = {
   extraSpins: 5,
   defaultStatusText: "Ready",
   noItemsMessage: "No items found for this category.",
-  fontFamily: "bold 11px system-ui",
+  fontFamily: "bold 10px system-ui",
   centreRadius: 20
 };
 // ==========================

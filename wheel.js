@@ -131,12 +131,9 @@ function drawWheel() {
 
     // Measure "thinness" of this slice using arc length at outer radius
     const arcAtOuter = radius * sliceAngle;
+    const targetArc = 80; // px – slices thinner than this push text outward
 
-    // Target arc length where we stop pushing text outwards (t = 0)
-    const targetArc = 80; // px – tweak if you like
-
-    // t = 0 for wide slices, -> 1 as slices get very thin
-    let t = 1 - Math.min(1, arcAtOuter / targetArc);
+    let t = 1 - Math.min(1, arcAtOuter / targetArc); // 0 = wide, 1 = very thin
     if (t < 0) t = 0;
 
     // Adaptive inner radius: thin slices push text further out
@@ -144,10 +141,10 @@ function drawWheel() {
     const outer = inner + bandThickness;
     const rText = inner + radialMargin; // where we actually draw text
 
-    // Available width along arc at the text radius
-    const arcAtText = rText * sliceAngle;
-    let maxWidth = arcAtText - 6;
-    maxWidth = Math.max(35, maxWidth); // never too tiny
+    // Fixed truncation rule:
+    // text must stay at least 3px inside the outer edge at this radius
+    let maxWidth = radius - 3 - rText;
+    maxWidth = Math.max(20, maxWidth); // minimum width so it is not absurdly tiny
 
     let text = label;
     const fullWidth = ctx.measureText(text).width;
@@ -184,6 +181,7 @@ function drawWheel() {
   ctx.closePath();
   ctx.fill();
 }
+
 
 
 // Spin logic

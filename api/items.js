@@ -5,7 +5,6 @@ const { Client } = require("@notionhq/client");
 const notion = new Client({ auth: process.env.NOTION_SECRET });
 const DATABASE_ID = process.env.NOTION_DATABASE_ID;
 
-// This function runs on Vercel as a serverless function
 module.exports = async (req, res) => {
   if (req.method !== "GET") {
     res.setHeader("Allow", "GET");
@@ -18,11 +17,13 @@ module.exports = async (req, res) => {
       .json({ error: "Server missing Notion configuration" });
   }
 
+  // Read category from query string, default to "Sides"
+  const category = (req.query && req.query.category) || "Sides";
+
   try {
     const pages = [];
     let cursor;
 
-    // Fetch all pages where multi-select "Type" contains "Sides"
     do {
       const response = await notion.databases.query({
         database_id: DATABASE_ID,
@@ -30,7 +31,7 @@ module.exports = async (req, res) => {
         filter: {
           property: "Type",
           multi_select: {
-            contains: "Sides"
+            contains: category
           }
         }
       });
@@ -39,14 +40,12 @@ module.exports = async (req, res) => {
       cursor = response.has_more ? response.next_cursor : undefined;
     } while (cursor);
 
-    // Map pages to simple items for the wheel
     const items = pages.map(page => {
       const prop = page.properties["Activity Name"];
       let label = "Untitled";
 
-      if (prop && prop.type === "title") {
-        const first = prop.title[0];
-        const text = first && first.plain_text;
+      if (prop && prop.type === "title" && prop.title.length > 0) {
+        const text = prop.title[0].plain_text;
         if (text && text.trim().length > 0) {
           label = text.trim();
         }

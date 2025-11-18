@@ -122,8 +122,8 @@ function drawWheel() {
     const label = items[i].label || "";
 
     // Start text closer to centre circle
-    const inner = CONFIG.centreRadius + 10;     // start here
-    const outer = radius - 8;                   // stop before outer edge
+    const inner = CONFIG.centreRadius + 10; // start here
+    const outer = radius - 8;               // stop before outer edge
     const maxWidth = outer - inner;
 
     let text = label;
@@ -131,7 +131,40 @@ function drawWheel() {
 
     // Truncate with ellipsis if needed
     if (maxWidth > 0) {
-      while (ctx.measureText(tex
+      while (ctx.measureText(text).width > maxWidth && text.length > 0) {
+        text = text.slice(0, -1);
+        truncated = true;
+      }
+      if (truncated && text.length > 0) {
+        text = text.slice(0, -1) + "…";
+      }
+    }
+
+    ctx.fillText(text, inner, 4);
+    ctx.restore();
+  }
+
+  // Centre circle
+  const width2 = canvas.width;
+  const height2 = canvas.height;
+  const cx = width2 / 2;
+  const cy = height2 / 2;
+
+  ctx.beginPath();
+  ctx.arc(cx, cy, CONFIG.centreRadius, 0, 2 * Math.PI);
+  ctx.fillStyle = "#ffffff";
+  ctx.fill();
+
+  // Pointer at top (tip pointing into wheel)
+  const radiusForPointer = Math.min(width2, height2) / 2 - 6;
+  ctx.fillStyle = "#e74c3c";
+  ctx.beginPath();
+  ctx.moveTo(cx, cy - radiusForPointer + 8);
+  ctx.lineTo(cx - 12, cy - radiusForPointer - 10);
+  ctx.lineTo(cx + 12, cy - radiusForPointer - 10);
+  ctx.closePath();
+  ctx.fill();
+}
 
 // Spin logic
 function spinWheel() {

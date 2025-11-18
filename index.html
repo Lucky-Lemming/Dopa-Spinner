@@ -11,21 +11,26 @@
     <h1>⚡️ Dopa-Menu Spinner</h1>
 
     <div class="controls">
-      <label for="category">Category:</label>
-      <select id="category">
-        <option value="Sides">Sides</option>
-        <option value="Starters">Starters</option>
-        <option value="Mains">Mains</option>
-        <option value="Desserts">Desserts</option>
-        <option value="Specials">Specials</option>
-      </select>
+      <div class="controls-row">
+        <label for="category">Category:</label>
+        <select id="category">
+          <option value="Sides">Sides</option>
+          <option value="Starters">Starters</option>
+          <option value="Mains">Mains</option>
+          <option value="Desserts">Desserts</option>
+          <option value="Specials">Specials</option>
+        </select>
+      </div>
 
-      <button id="refresh">Refresh from Notion</button>
-      <button id="spin">Spin</button>
+      <div class="controls-row">
+        <button id="refresh">Refresh from Notion</button>
+        <button id="spin">Spin</button>
+      </div>
+
       <span id="status"></span>
     </div>
 
-    <canvas id="wheel" width="400" height="400"></canvas>
+    <canvas id="wheel"></canvas>
 
     <div class="result">
       <p>Selected: <span id="selected"></span></p>

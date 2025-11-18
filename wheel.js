@@ -8,7 +8,7 @@ const CONFIG = {
   defaultStatusText: "Ready",
   noItemsMessage: "No items found for this category.",
   fontFamily: "14px system-ui",
-  centreRadius: 30
+  centreRadius: 26
 };
 // ==========================
 
@@ -19,10 +19,19 @@ const spinBtn = document.getElementById("spin");
 const statusEl = document.getElementById("status");
 const selectedEl = document.getElementById("selected");
 const categorySelect = document.getElementById("category");
+const appContainer = document.querySelector(".app");
 
 let items = [];
 let currentAngle = 0;
 let isSpinning = false;
+
+// Resize canvas based on container width
+function resizeCanvas() {
+  const containerWidth = appContainer.clientWidth;
+  const size = Math.min(containerWidth - 40, 360); // keep some padding
+  canvas.width = size;
+  canvas.height = size;
+}
 
 // Helper to get current category
 function getCategory() {
@@ -54,11 +63,13 @@ async function fetchItems() {
 
     selectedEl.textContent = "";
     currentAngle = 0;
+    resizeCanvas();
     drawWheel();
   } catch (err) {
     console.error(err);
     setStatus("Failed to load items");
     items = [];
+    resizeCanvas();
     drawWheel();
   } finally {
     setButtonsDisabled(false);
@@ -76,7 +87,7 @@ function drawWheel() {
   ctx.clearRect(0, 0, width, height);
 
   if (!items.length) {
-    ctx.fillStyle = "#777";
+    ctx.fillStyle = "#999";
     ctx.font = CONFIG.fontFamily;
     ctx.textAlign = "center";
     ctx.fillText("No items", centerX, centerY);
@@ -117,9 +128,9 @@ function drawWheel() {
 
   ctx.fillStyle = "#e74c3c";
   ctx.beginPath();
-  ctx.moveTo(centerX, centerY - radius - 10);
-  ctx.lineTo(centerX - 15, centerY - radius + 15);
-  ctx.lineTo(centerX + 15, centerY - radius + 15);
+  ctx.moveTo(centerX, centerY - radius - 8);
+  ctx.lineTo(centerX - 12, centerY - radius + 12);
+  ctx.lineTo(centerX + 12, centerY - radius + 12);
   ctx.closePath();
   ctx.fill();
 }
@@ -179,10 +190,13 @@ function setButtonsDisabled(disabled) {
 // Events
 refreshBtn.addEventListener("click", fetchItems);
 spinBtn.addEventListener("click", spinWheel);
-
-// Auto-refresh when category changes
 categorySelect.addEventListener("change", fetchItems);
+window.addEventListener("resize", () => {
+  resizeCanvas();
+  drawWheel();
+});
 
 // Initial load
 setStatus(CONFIG.defaultStatusText);
+resizeCanvas();
 fetchItems();

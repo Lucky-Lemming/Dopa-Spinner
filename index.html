@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Notion Meal Spinner</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <div class="app">
+    <h1>Meal Spinner</h1>
+
+    <div class="controls">
+      <button id="refresh">Refresh from Notion</button>
+      <button id="spin">Spin</button>
+      <span id="status"></span>
+    </div>
+
+    <canvas id="wheel" width="400" height="400"></canvas>
+
+    <div class="result">
+      <p>Selected: <span id="selected"></span></p>
+    </div>
+  </div>
+
+  <script src="/wheel.js"></script>
+</body>
+</html>

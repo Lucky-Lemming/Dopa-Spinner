@@ -124,11 +124,11 @@ function drawWheel() {
     const label = items[i].label || "";
 
     // Right edge of text sits just inside outer edge
-    const marginOuter = 3; // px from outer circle
+    const marginOuter = 5; // px from outer circle
     const rEnd = radius - marginOuter;
 
     // Left edge must stay outside centre circle + marginInner
-    const marginInner = 2;
+    const marginInner = 5;
     const minInner = CONFIG.centreRadius + marginInner;
 
     let maxWidth = rEnd - minInner;

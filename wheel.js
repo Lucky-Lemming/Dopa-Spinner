@@ -97,8 +97,6 @@ function drawWheel() {
 
   const sliceAngle = (2 * Math.PI) / items.length;
   const fontSize = parseInt(CONFIG.fontFamily, 10) || 10;
-  const radialMargin = 3; // px above/below text
-  const bandThickness = fontSize + radialMargin * 2;
 
   for (let i = 0; i < items.length; i++) {
     const startAngle = currentAngle + i * sliceAngle;
@@ -114,38 +112,27 @@ function drawWheel() {
     ctx.closePath();
     ctx.fill();
 
-    // -------- label --------
+    // -------- label (right-aligned) --------
     ctx.save();
     ctx.translate(centerX, centerY);
     ctx.rotate(startAngle + sliceAngle / 2);
 
     ctx.fillStyle = "#ffffff";
     ctx.font = CONFIG.fontFamily;
-    ctx.textAlign = "left";
+    ctx.textAlign = "right";
 
     const label = items[i].label || "";
 
-    // Baseline: never closer than 2px from centre circle
-    const minInner = CONFIG.centreRadius + 2;
-    const maxOuter = radius - 4;
-    const maxInner = Math.max(minInner, maxOuter - bandThickness);
+    // Right edge of text sits just inside outer edge
+    const marginOuter = 3; // px from outer circle
+    const rEnd = radius - marginOuter;
 
-    // Measure "thinness" of this slice using arc length at outer radius
-    const arcAtOuter = radius * sliceAngle;
-    const targetArc = 80; // px – slices thinner than this push text outward
+    // Left edge must stay outside centre circle + marginInner
+    const marginInner = 2;
+    const minInner = CONFIG.centreRadius + marginInner;
 
-    let t = 1 - Math.min(1, arcAtOuter / targetArc); // 0 = wide, 1 = very thin
-    if (t < 0) t = 0;
-
-    // Adaptive inner radius: thin slices push text further out
-    const inner = minInner + t * (maxInner - minInner);
-    const outer = inner + bandThickness;
-    const rText = inner + radialMargin; // where we actually draw text
-
-    // Fixed truncation rule:
-    // text must stay at least 3px inside the outer edge at this radius
-    let maxWidth = radius - 3 - rText;
-    maxWidth = Math.max(20, maxWidth); // minimum width so it is not absurdly tiny
+    let maxWidth = rEnd - minInner;
+    maxWidth = Math.max(20, maxWidth); // never absurdly tiny
 
     let text = label;
     const fullWidth = ctx.measureText(text).width;
@@ -161,7 +148,8 @@ function drawWheel() {
       }
     }
 
-    ctx.fillText(text, rText, fontSize / 3);
+    // y offset keeps text roughly centred vertically in the slice
+    ctx.fillText(text, rEnd, fontSize / 3);
     ctx.restore();
     // -------- end label --------
   }

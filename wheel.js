@@ -125,7 +125,7 @@ function drawWheel() {
     // - based on font size
     // - ~3px margin above and below the text
     const fontSize = parseInt(CONFIG.fontFamily, 10) || 10;
-    const radialMargin = 3;   // px above and below text
+    const radialMargin = 1;   // px above and below text
     const outerMargin = 6;    // px from outer edge of wheel
 
     const outer = radius - outerMargin;

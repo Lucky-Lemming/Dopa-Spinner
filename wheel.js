@@ -96,6 +96,8 @@ function drawWheel() {
 
   const sliceAngle = (2 * Math.PI) / items.length;
   const fontSize = parseInt(CONFIG.fontFamily, 10) || 10;
+  const radialMargin = 3; // px above/below text
+  const bandThickness = fontSize + radialMargin * 2;
 
   for (let i = 0; i < items.length; i++) {
     const startAngle = currentAngle + i * sliceAngle;
@@ -104,14 +106,14 @@ function drawWheel() {
     const hue = (i * 360) / items.length;
     ctx.fillStyle = `hsl(${hue}, 70%, 55%)`;
 
-    // Slice fill (no borders)
+    // Slice fill
     ctx.beginPath();
     ctx.moveTo(centerX, centerY);
     ctx.arc(centerX, centerY, radius, startAngle, endAngle);
     ctx.closePath();
     ctx.fill();
 
-    // ---------- Label ----------
+    // -------- label --------
     ctx.save();
     ctx.translate(centerX, centerY);
     ctx.rotate(startAngle + sliceAngle / 2);
@@ -122,24 +124,34 @@ function drawWheel() {
 
     const label = items[i].label || "";
 
-    // Place text on a ring between centre and edge
-    const radialPadding = 6;
-    const textRadius =
-      CONFIG.centreRadius +
-      radialPadding +
-      (radius - CONFIG.centreRadius - radialPadding * 2) * 0.55;
+    // Baseline: never closer than 2px from centre circle
+    const minInner = CONFIG.centreRadius + 2;
+    const maxOuter = radius - 4;
+    const maxInner = Math.max(minInner, maxOuter - bandThickness);
 
-    // Available length along the arc at this radius
-    const arcLength = textRadius * sliceAngle;
+    // Measure "thinness" of this slice using arc length at outer radius
+    const arcAtOuter = radius * sliceAngle;
 
-    // Allow a bit more than the pure arc length (to avoid over-truncation),
-    // but clamp so very wide slices don't bleed.
-    const fullWidth = ctx.measureText(label).width;
-    let maxWidth = arcLength * 1.4;      // scale factor
-    maxWidth = Math.max(40, maxWidth);   // minimum so narrow slices still show a few chars
-    maxWidth = Math.min(maxWidth, fullWidth); // never larger than full label
+    // Target arc length where we stop pushing text outwards (t = 0)
+    const targetArc = 80; // px – tweak if you like
+
+    // t = 0 for wide slices, -> 1 as slices get very thin
+    let t = 1 - Math.min(1, arcAtOuter / targetArc);
+    if (t < 0) t = 0;
+
+    // Adaptive inner radius: thin slices push text further out
+    const inner = minInner + t * (maxInner - minInner);
+    const outer = inner + bandThickness;
+    const rText = inner + radialMargin; // where we actually draw text
+
+    // Available width along arc at the text radius
+    const arcAtText = rText * sliceAngle;
+    let maxWidth = arcAtText - 6;
+    maxWidth = Math.max(35, maxWidth); // never too tiny
 
     let text = label;
+    const fullWidth = ctx.measureText(text).width;
+
     if (fullWidth > maxWidth) {
       let truncated = false;
       while (ctx.measureText(text).width > maxWidth && text.length > 0) {
@@ -151,10 +163,9 @@ function drawWheel() {
       }
     }
 
-    // Slight vertical offset so text sits nicely in the slice
-    ctx.fillText(text, textRadius, fontSize / 3);
+    ctx.fillText(text, rText, fontSize / 3);
     ctx.restore();
-    // ---------- end label ----------
+    // -------- end label --------
   }
 
   // Centre circle

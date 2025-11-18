@@ -11,17 +11,14 @@ body {
   justify-content: center;
   align-items: flex-start;
   min-height: 100vh;
-  background: #f4f4f4;
+  background: #ffffff; /* plain white */
 }
 
 .app {
-  background: #ffffff;
-  padding: 16px;
-  border-radius: 16px;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
   text-align: center;
   width: 100%;
   max-width: 420px;
+  margin: 0 auto;
 }
 
 h1 {

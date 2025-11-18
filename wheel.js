@@ -128,11 +128,13 @@ function drawWheel() {
 
   ctx.fillStyle = "#e74c3c";
   ctx.beginPath();
-  ctx.moveTo(centerX, centerY - radius - 8);
-  ctx.lineTo(centerX - 12, centerY - radius + 12);
-  ctx.lineTo(centerX + 12, centerY - radius + 12);
+  // Tip of the arrow slightly inside the wheel, pointing downwards into the slices
+  ctx.moveTo(centerX, centerY - radius + 8);
+  ctx.lineTo(centerX - 12, centerY - radius - 10);
+  ctx.lineTo(centerX + 12, centerY - radius - 10);
   ctx.closePath();
   ctx.fill();
+
 }
 
 // Spin logic

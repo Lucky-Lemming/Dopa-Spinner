@@ -7,7 +7,7 @@ const CONFIG = {
   extraSpins: 5,
   defaultStatusText: "Ready",
   noItemsMessage: "No items found for this category.",
-  fontFamily: "14px system-ui",
+  fontFamily: "11px system-ui",
   centreRadius: 20
 };
 // ==========================
@@ -88,7 +88,7 @@ function drawWheel() {
 
   if (!items.length) {
     ctx.fillStyle = "#999";
-    ctx.font = "12px system-ui";
+    ctx.font = CONFIG.fontFamily;
     ctx.textAlign = "center";
     ctx.fillText("No items", centerX, centerY);
     return;
@@ -103,7 +103,7 @@ function drawWheel() {
     const hue = (i * 360) / items.length;
     ctx.fillStyle = `hsl(${hue}, 70%, 55%)`;
 
-    // Slice fill (no white borders)
+    // Slice fill (no borders)
     ctx.beginPath();
     ctx.moveTo(centerX, centerY);
     ctx.arc(centerX, centerY, radius, startAngle, endAngle);
@@ -116,21 +116,21 @@ function drawWheel() {
     ctx.rotate(startAngle + sliceAngle / 2);
 
     ctx.fillStyle = "#ffffff";
-    ctx.font = "12px system-ui";
+    ctx.font = CONFIG.fontFamily;
     ctx.textAlign = "left";
 
     const label = items[i].label || "";
 
-    // Start text closer to centre circle
-    const inner = CONFIG.centreRadius + 10; // start here
-    const outer = radius - 8;               // stop before outer edge
+    // Margin so text sits inside the coloured segment
+    const inner = CONFIG.centreRadius + 16; // start a bit away from centre
+    const outer = radius - 16;             // leave margin before edge
     const maxWidth = outer - inner;
 
     let text = label;
     let truncated = false;
 
-    // Truncate with ellipsis if needed
     if (maxWidth > 0) {
+      // Truncate with ellipsis if needed
       while (ctx.measureText(text).width > maxWidth && text.length > 0) {
         text = text.slice(0, -1);
         truncated = true;
@@ -145,23 +145,18 @@ function drawWheel() {
   }
 
   // Centre circle
-  const width2 = canvas.width;
-  const height2 = canvas.height;
-  const cx = width2 / 2;
-  const cy = height2 / 2;
-
   ctx.beginPath();
-  ctx.arc(cx, cy, CONFIG.centreRadius, 0, 2 * Math.PI);
+  ctx.arc(centerX, centerY, CONFIG.centreRadius, 0, 2 * Math.PI);
   ctx.fillStyle = "#ffffff";
   ctx.fill();
 
-  // Pointer at top (tip pointing into wheel)
-  const radiusForPointer = Math.min(width2, height2) / 2 - 6;
-  ctx.fillStyle = "#e74c3c";
+  // Pointer at top (black, pointing into wheel)
+  const pointerRadius = radius + 4;
+  ctx.fillStyle = "#000000";
   ctx.beginPath();
-  ctx.moveTo(cx, cy - radiusForPointer + 8);
-  ctx.lineTo(cx - 12, cy - radiusForPointer - 10);
-  ctx.lineTo(cx + 12, cy - radiusForPointer - 10);
+  ctx.moveTo(centerX, centerY - pointerRadius);          // tip
+  ctx.lineTo(centerX - 10, centerY - (pointerRadius - 14));
+  ctx.lineTo(centerX + 10, centerY - (pointerRadius - 14));
   ctx.closePath();
   ctx.fill();
 }
@@ -177,10 +172,13 @@ function spinWheel() {
   const sliceAngle = (2 * Math.PI) / items.length;
   const targetIndex = Math.floor(Math.random() * items.length);
 
+  // We want the centre of the target slice to end at the pointer angle (top)
+  const pointerAngle = -Math.PI / 2; // straight up
   const extraSpins = CONFIG.extraSpins;
+
   const targetAngle =
     2 * Math.PI * extraSpins +
-    (2 * Math.PI - (targetIndex * sliceAngle + sliceAngle / 2));
+    (pointerAngle - (targetIndex * sliceAngle + sliceAngle / 2));
 
   const startAngle = currentAngle;
   const totalChange = targetAngle - startAngle;

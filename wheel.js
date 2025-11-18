@@ -115,14 +115,14 @@ function drawWheel() {
     ctx.translate(centerX, centerY);
     ctx.rotate(startAngle + sliceAngle / 2);
 
-    ctx.fillStyle = "#ffffff";
+    ctx.fillStyle = "#000000";
     ctx.font = CONFIG.fontFamily;
     ctx.textAlign = "left";
 
     const label = items[i].label || "";
 
     // Margin so text sits inside the coloured segment
-    const inner = CONFIG.centreRadius + 16; // start a bit away from centre
+    const inner = CONFIG.centreRadius + 20; // start a bit away from centre
     const outer = radius - 16;             // leave margin before edge
     const maxWidth = outer - inner;
 
@@ -150,15 +150,18 @@ function drawWheel() {
   ctx.fillStyle = "#ffffff";
   ctx.fill();
 
-  // Pointer at top (black, pointing into wheel)
-  const pointerRadius = radius + 4;
+  // Pointer at top (black, tip pointing down into the wheel)
+  const pointerRadius = radius;
   ctx.fillStyle = "#000000";
   ctx.beginPath();
-  ctx.moveTo(centerX, centerY - pointerRadius);          // tip
-  ctx.lineTo(centerX - 10, centerY - (pointerRadius - 14));
-  ctx.lineTo(centerX + 10, centerY - (pointerRadius - 14));
+  // Tip slightly inside the wheel
+  ctx.moveTo(centerX, centerY - pointerRadius + 8);
+  // Base slightly outside the wheel
+  ctx.lineTo(centerX - 10, centerY - pointerRadius - 8);
+  ctx.lineTo(centerX + 10, centerY - pointerRadius - 8);
   ctx.closePath();
   ctx.fill();
+
 }
 
 // Spin logic

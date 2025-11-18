@@ -4,7 +4,7 @@
 const CONFIG = {
   apiEndpoint: "/api/items",
   spinDurationMs: 3000,
-  extraSpins: 5,
+  extraSpins: 5, // base number of extra full rotations
   defaultStatusText: "Ready",
   noItemsMessage: "No items found for this category.",
   fontFamily: "bold 10px system-ui",
@@ -194,13 +194,18 @@ function spinWheel() {
   const sliceAngle = (2 * Math.PI) / items.length;
   const targetIndex = Math.floor(Math.random() * items.length);
 
-  // We want the centre of the target slice to end at the pointer angle (top)
-  const pointerAngle = -Math.PI / 2; // straight up
-  const extraSpins = CONFIG.extraSpins;
+  // Normalise currentAngle to avoid it growing unbounded
+  const twoPi = 2 * Math.PI;
+  currentAngle = ((currentAngle % twoPi) + twoPi) % twoPi;
 
-  const targetAngle =
-    2 * Math.PI * extraSpins +
-    (pointerAngle - (targetIndex * sliceAngle + sliceAngle / 2));
+  // Angle where the centre of the target slice sits under the pointer (top)
+  const pointerAngle = -Math.PI / 2; // straight up
+  const targetCentreAngle = targetIndex * sliceAngle + sliceAngle / 2;
+  const baseAngle = pointerAngle - targetCentreAngle;
+
+  // Ensure we always spin forward by several full rotations
+  const rotations = CONFIG.extraSpins + 2; // tweak if you want more/less spin
+  const targetAngle = baseAngle + rotations * twoPi;
 
   const startAngle = currentAngle;
   const totalChange = targetAngle - startAngle;
@@ -220,6 +225,7 @@ function spinWheel() {
     } else {
       isSpinning = false;
       setButtonsDisabled(false);
+      currentAngle = targetAngle; // lock in final angle
       const selected = items[targetIndex];
       selectedEl.textContent = selected.label || "";
       setStatus(CONFIG.defaultStatusText);

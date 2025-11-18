@@ -103,47 +103,35 @@ function drawWheel() {
     const hue = (i * 360) / items.length;
     ctx.fillStyle = `hsl(${hue}, 70%, 55%)`;
 
-    // Slice fill
+    // Slice fill (no white borders)
     ctx.beginPath();
     ctx.moveTo(centerX, centerY);
     ctx.arc(centerX, centerY, radius, startAngle, endAngle);
     ctx.closePath();
     ctx.fill();
 
-    // Thin white border so narrow slices are visible
-    ctx.strokeStyle = "#ffffff";
-    ctx.lineWidth = 1.5;
-    ctx.stroke();
-
     // Label
     ctx.save();
     ctx.translate(centerX, centerY);
     ctx.rotate(startAngle + sliceAngle / 2);
-    ctx.textAlign = "center";
+
     ctx.fillStyle = "#ffffff";
     ctx.font = "12px system-ui";
+    ctx.textAlign = "left";
 
     const label = items[i].label || "";
-    const textRadius = radius - 18; // keep away from edge and centre
-    ctx.fillText(label, textRadius, 4);
-    ctx.restore();
-  }
 
-  // Centre circle
-  ctx.beginPath();
-  ctx.arc(centerX, centerY, CONFIG.centreRadius, 0, 2 * Math.PI);
-  ctx.fillStyle = "#ffffff";
-  ctx.fill();
+    // Start text closer to centre circle
+    const inner = CONFIG.centreRadius + 10;     // start here
+    const outer = radius - 8;                   // stop before outer edge
+    const maxWidth = outer - inner;
 
-  // Pointer at top
-  ctx.fillStyle = "#e74c3c";
-  ctx.beginPath();
-  ctx.moveTo(centerX, centerY - radius + 8);
-  ctx.lineTo(centerX - 12, centerY - radius - 10);
-  ctx.lineTo(centerX + 12, centerY - radius - 10);
-  ctx.closePath();
-  ctx.fill();
-}
+    let text = label;
+    let truncated = false;
+
+    // Truncate with ellipsis if needed
+    if (maxWidth > 0) {
+      while (ctx.measureText(tex
 
 // Spin logic
 function spinWheel() {

@@ -95,6 +95,7 @@ function drawWheel() {
   }
 
   const sliceAngle = (2 * Math.PI) / items.length;
+  const fontSize = parseInt(CONFIG.fontFamily, 10) || 10;
 
   for (let i = 0; i < items.length; i++) {
     const startAngle = currentAngle + i * sliceAngle;
@@ -110,7 +111,7 @@ function drawWheel() {
     ctx.closePath();
     ctx.fill();
 
-    // Label
+    // ---------- Label ----------
     ctx.save();
     ctx.translate(centerX, centerY);
     ctx.rotate(startAngle + sliceAngle / 2);
@@ -121,22 +122,26 @@ function drawWheel() {
 
     const label = items[i].label || "";
 
-    // Text sits on a ring between centre and edge
-    const fontSize = parseInt(CONFIG.fontFamily, 10) || 10;
-    const radialPadding = 4;
+    // Place text on a ring between centre and edge
+    const radialPadding = 6;
     const textRadius =
       CONFIG.centreRadius +
       radialPadding +
-      (radius - CONFIG.centreRadius - radialPadding * 2) * 0.6;
+      (radius - CONFIG.centreRadius - radialPadding * 2) * 0.55;
 
-    // Width available along the arc at that radius
+    // Available length along the arc at this radius
     const arcLength = textRadius * sliceAngle;
-    const maxWidth = Math.max(20, arcLength - 6);
+
+    // Allow a bit more than the pure arc length (to avoid over-truncation),
+    // but clamp so very wide slices don't bleed.
+    const fullWidth = ctx.measureText(label).width;
+    let maxWidth = arcLength * 1.4;      // scale factor
+    maxWidth = Math.max(40, maxWidth);   // minimum so narrow slices still show a few chars
+    maxWidth = Math.min(maxWidth, fullWidth); // never larger than full label
 
     let text = label;
-    let truncated = false;
-
-    if (maxWidth > 0) {
+    if (fullWidth > maxWidth) {
+      let truncated = false;
       while (ctx.measureText(text).width > maxWidth && text.length > 0) {
         text = text.slice(0, -1);
         truncated = true;
@@ -146,9 +151,10 @@ function drawWheel() {
       }
     }
 
-    // Slight vertical offset so it visually centres in the slice
+    // Slight vertical offset so text sits nicely in the slice
     ctx.fillText(text, textRadius, fontSize / 3);
     ctx.restore();
+    // ---------- end label ----------
   }
 
   // Centre circle
@@ -161,14 +167,13 @@ function drawWheel() {
   const pointerRadius = radius;
   ctx.fillStyle = "#000000";
   ctx.beginPath();
-  // Tip slightly inside the wheel
-  ctx.moveTo(centerX, centerY - pointerRadius + 8);
-  // Base slightly outside the wheel
+  ctx.moveTo(centerX, centerY - pointerRadius + 8); // tip inside wheel
   ctx.lineTo(centerX - 10, centerY - pointerRadius - 8);
   ctx.lineTo(centerX + 10, centerY - pointerRadius - 8);
   ctx.closePath();
   ctx.fill();
 }
+
 
 // Spin logic
 function spinWheel() {

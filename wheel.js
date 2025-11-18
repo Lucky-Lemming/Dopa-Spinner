@@ -128,7 +128,7 @@ function drawWheel() {
     const rEnd = radius - marginOuter;
 
     // Left edge must stay outside centre circle + marginInner
-    const marginInner = 5;
+    const marginInner = 10;
     const minInner = CONFIG.centreRadius + marginInner;
 
     let maxWidth = rEnd - minInner;

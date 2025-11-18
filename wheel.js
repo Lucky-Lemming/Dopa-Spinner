@@ -8,7 +8,7 @@ const CONFIG = {
   defaultStatusText: "Ready",
   noItemsMessage: "No items found for this category.",
   fontFamily: "14px system-ui",
-  centreRadius: 26
+  centreRadius: 20
 };
 // ==========================
 

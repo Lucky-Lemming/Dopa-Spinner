@@ -115,7 +115,7 @@ function drawWheel() {
     ctx.translate(centerX, centerY);
     ctx.rotate(startAngle + sliceAngle / 2);
 
-    ctx.fillStyle = "#000000";
+    ctx.fillStyle = "#ffffff";
     ctx.font = CONFIG.fontFamily;
     ctx.textAlign = "left";
 

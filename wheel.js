@@ -110,7 +110,7 @@ function drawWheel() {
     ctx.closePath();
     ctx.fill();
 
-        // Label
+    // Label
     ctx.save();
     ctx.translate(centerX, centerY);
     ctx.rotate(startAngle + sliceAngle / 2);
@@ -121,8 +121,7 @@ function drawWheel() {
 
     const label = items[i].label || "";
 
-    // Adaptive radial band for text:
-        // Adaptive radial band for text, centred between inner circle and edge
+    // Adaptive radial band for text, centred between inner circle and edge
     const fontSize = parseInt(CONFIG.fontFamily, 10) || 10;
     const radialMargin = 3; // px above and below text
 
@@ -162,29 +161,9 @@ function drawWheel() {
       }
     }
 
-    // Draw text inside the band, vertically centred
+    // Draw text inside the band
     ctx.fillText(text, inner, 4);
     ctx.restore();
-
-
-    let text = label;
-    let truncated = false;
-
-    if (maxWidth > 0) {
-      // Truncate with ellipsis if needed
-      while (ctx.measureText(text).width > maxWidth && text.length > 0) {
-        text = text.slice(0, -1);
-        truncated = true;
-      }
-      if (truncated && text.length > 0) {
-        text = text.slice(0, -1) + "…";
-      }
-    }
-
-    // Draw text inside the band, vertically centred (y=4 works well for this font size)
-    ctx.fillText(text, inner, 4);
-    ctx.restore();
-
   }
 
   // Centre circle
@@ -204,7 +183,6 @@ function drawWheel() {
   ctx.lineTo(centerX + 10, centerY - pointerRadius - 8);
   ctx.closePath();
   ctx.fill();
-
 }
 
 // Spin logic

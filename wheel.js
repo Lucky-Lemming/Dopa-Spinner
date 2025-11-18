@@ -121,37 +121,22 @@ function drawWheel() {
 
     const label = items[i].label || "";
 
-    // Adaptive radial band for text, centred between inner circle and edge
+    // Text sits on a ring between centre and edge
     const fontSize = parseInt(CONFIG.fontFamily, 10) || 10;
-    const radialMargin = 3; // px above and below text
+    const radialPadding = 4;
+    const textRadius =
+      CONFIG.centreRadius +
+      radialPadding +
+      (radius - CONFIG.centreRadius - radialPadding * 2) * 0.6;
 
-    const bandThickness = fontSize + radialMargin * 2;
-
-    const minInner = CONFIG.centreRadius + 6;
-    const maxOuter = radius - 6;
-
-    // Centre the band between centre circle and edge
-    let bandCentre = (maxOuter + minInner) / 2;
-    let inner = bandCentre - bandThickness / 2;
-    let outer = bandCentre + bandThickness / 2;
-
-    // Clamp if radius is very small
-    if (inner < minInner) {
-      inner = minInner;
-      outer = inner + bandThickness;
-    }
-    if (outer > maxOuter) {
-      outer = maxOuter;
-      inner = outer - bandThickness;
-    }
-
-    const maxWidth = outer - inner;
+    // Width available along the arc at that radius
+    const arcLength = textRadius * sliceAngle;
+    const maxWidth = Math.max(20, arcLength - 6);
 
     let text = label;
     let truncated = false;
 
     if (maxWidth > 0) {
-      // Truncate with ellipsis if needed
       while (ctx.measureText(text).width > maxWidth && text.length > 0) {
         text = text.slice(0, -1);
         truncated = true;
@@ -161,8 +146,8 @@ function drawWheel() {
       }
     }
 
-    // Draw text inside the band
-    ctx.fillText(text, inner, 4);
+    // Slight vertical offset so it visually centres in the slice
+    ctx.fillText(text, textRadius, fontSize / 3);
     ctx.restore();
   }
 

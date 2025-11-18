@@ -122,22 +122,50 @@ function drawWheel() {
     const label = items[i].label || "";
 
     // Adaptive radial band for text:
-    // - based on font size
-    // - ~3px margin above and below the text
+        // Adaptive radial band for text, centred between inner circle and edge
     const fontSize = parseInt(CONFIG.fontFamily, 10) || 10;
-    const radialMargin = 1;   // px above and below text
-    const outerMargin = 1;    // px from outer edge of wheel
+    const radialMargin = 3; // px above and below text
 
-    const outer = radius - outerMargin;
-    let inner = outer - (fontSize + radialMargin * 2); // band thickness = fontSize + 2*margin
+    const bandThickness = fontSize + radialMargin * 2;
 
-    // Do not let the band overlap the centre circle
-    const minInner = CONFIG.centreRadius + 8;
+    const minInner = CONFIG.centreRadius + 6;
+    const maxOuter = radius - 6;
+
+    // Centre the band between centre circle and edge
+    let bandCentre = (maxOuter + minInner) / 2;
+    let inner = bandCentre - bandThickness / 2;
+    let outer = bandCentre + bandThickness / 2;
+
+    // Clamp if radius is very small
     if (inner < minInner) {
       inner = minInner;
+      outer = inner + bandThickness;
+    }
+    if (outer > maxOuter) {
+      outer = maxOuter;
+      inner = outer - bandThickness;
     }
 
-    const maxWidth = outer - 3;
+    const maxWidth = outer - inner;
+
+    let text = label;
+    let truncated = false;
+
+    if (maxWidth > 0) {
+      // Truncate with ellipsis if needed
+      while (ctx.measureText(text).width > maxWidth && text.length > 0) {
+        text = text.slice(0, -1);
+        truncated = true;
+      }
+      if (truncated && text.length > 0) {
+        text = text.slice(0, -1) + "…";
+      }
+    }
+
+    // Draw text inside the band, vertically centred
+    ctx.fillText(text, inner, 4);
+    ctx.restore();
+
 
     let text = label;
     let truncated = false;

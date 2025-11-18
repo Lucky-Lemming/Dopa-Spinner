@@ -110,7 +110,7 @@ function drawWheel() {
     ctx.closePath();
     ctx.fill();
 
-    // Label
+        // Label
     ctx.save();
     ctx.translate(centerX, centerY);
     ctx.rotate(startAngle + sliceAngle / 2);
@@ -121,9 +121,22 @@ function drawWheel() {
 
     const label = items[i].label || "";
 
-    // Margin so text sits inside the coloured segment
-    const inner = CONFIG.centreRadius + 25; // start a bit away from centre
-    const outer = radius - 8;             // leave margin before edge
+    // Adaptive radial band for text:
+    // - based on font size
+    // - ~3px margin above and below the text
+    const fontSize = parseInt(CONFIG.fontFamily, 10) || 10;
+    const radialMargin = 3;   // px above and below text
+    const outerMargin = 6;    // px from outer edge of wheel
+
+    const outer = radius - outerMargin;
+    let inner = outer - (fontSize + radialMargin * 2); // band thickness = fontSize + 2*margin
+
+    // Do not let the band overlap the centre circle
+    const minInner = CONFIG.centreRadius + 8;
+    if (inner < minInner) {
+      inner = minInner;
+    }
+
     const maxWidth = outer - inner;
 
     let text = label;
@@ -140,8 +153,10 @@ function drawWheel() {
       }
     }
 
+    // Draw text inside the band, vertically centred (y=4 works well for this font size)
     ctx.fillText(text, inner, 4);
     ctx.restore();
+
   }
 
   // Centre circle

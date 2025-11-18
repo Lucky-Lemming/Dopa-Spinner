@@ -122,7 +122,7 @@ function drawWheel() {
     const label = items[i].label || "";
 
     // Margin so text sits inside the coloured segment
-    const inner = CONFIG.centreRadius + 20; // start a bit away from centre
+    const inner = CONFIG.centreRadius + 25; // start a bit away from centre
     const outer = radius - 8;             // leave margin before edge
     const maxWidth = outer - inner;
 

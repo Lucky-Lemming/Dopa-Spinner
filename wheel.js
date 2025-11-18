@@ -6,7 +6,7 @@ const CONFIG = {
   spinDurationMs: 3000,
   extraSpins: 5,
   defaultStatusText: "Ready",
-  noItemsMessage: "No items found. Check Notion filter.",
+  noItemsMessage: "No items found for this category.",
   fontFamily: "14px system-ui",
   centreRadius: 30
 };
@@ -18,18 +18,27 @@ const refreshBtn = document.getElementById("refresh");
 const spinBtn = document.getElementById("spin");
 const statusEl = document.getElementById("status");
 const selectedEl = document.getElementById("selected");
+const categorySelect = document.getElementById("category");
 
 let items = [];
 let currentAngle = 0;
 let isSpinning = false;
 
+// Helper to get current category
+function getCategory() {
+  return categorySelect.value;
+}
+
 // Fetch items from backend
 async function fetchItems() {
-  setStatus("Loading items...");
+  const category = encodeURIComponent(getCategory());
+  const url = `${CONFIG.apiEndpoint}?category=${category}`;
+
+  setStatus(`Loading ${getCategory()}...`);
   setButtonsDisabled(true);
 
   try {
-    const res = await fetch(CONFIG.apiEndpoint);
+    const res = await fetch(url);
     if (!res.ok) {
       throw new Error("HTTP error " + res.status);
     }
@@ -49,6 +58,8 @@ async function fetchItems() {
   } catch (err) {
     console.error(err);
     setStatus("Failed to load items");
+    items = [];
+    drawWheel();
   } finally {
     setButtonsDisabled(false);
   }
@@ -74,12 +85,10 @@ function drawWheel() {
 
   const sliceAngle = (2 * Math.PI) / items.length;
 
-  // Slices
   for (let i = 0; i < items.length; i++) {
     const startAngle = currentAngle + i * sliceAngle;
     const endAngle = startAngle + sliceAngle;
 
-    // Simple colour variation by hue
     const hue = (i * 360) / items.length;
     ctx.fillStyle = `hsl(${hue}, 70%, 55%)`;
 
@@ -89,7 +98,6 @@ function drawWheel() {
     ctx.closePath();
     ctx.fill();
 
-    // Label
     ctx.save();
     ctx.translate(centerX, centerY);
     ctx.rotate(startAngle + sliceAngle / 2);
@@ -102,13 +110,11 @@ function drawWheel() {
     ctx.restore();
   }
 
-  // Centre circle
   ctx.beginPath();
   ctx.arc(centerX, centerY, CONFIG.centreRadius, 0, 2 * Math.PI);
   ctx.fillStyle = "#ffffff";
   ctx.fill();
 
-  // Pointer at top
   ctx.fillStyle = "#e74c3c";
   ctx.beginPath();
   ctx.moveTo(centerX, centerY - radius - 10);
@@ -142,7 +148,7 @@ function spinWheel() {
   function animate(now) {
     const elapsed = now - startTime;
     const t = Math.min(elapsed / duration, 1);
-    const eased = 1 - Math.pow(1 - t, 3); // ease out cubic
+    const eased = 1 - Math.pow(1 - t, 3);
 
     currentAngle = startAngle + totalChange * eased;
     drawWheel();
@@ -170,9 +176,12 @@ function setButtonsDisabled(disabled) {
   spinBtn.disabled = disabled || !items.length;
 }
 
-// Wire up events
+// Events
 refreshBtn.addEventListener("click", fetchItems);
 spinBtn.addEventListener("click", spinWheel);
+
+// Auto-refresh when category changes
+categorySelect.addEventListener("change", fetchItems);
 
 // Initial load
 setStatus(CONFIG.defaultStatusText);
